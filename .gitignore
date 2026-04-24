@@ -1,35 +1,13 @@
-# Expo
-.expo
-.expo-shared
-dist
+node_modules/
+.expo/
+.expo-shared/
+dist/
+build/
 .env
 .env.local
-.env.*.local
-
-# Node
-node_modules
-npm-debug.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-web-build/
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
-*~
+.vscode/
+.idea/
+*.log
 .DS_Store
-
-# React Native
-*.hprof
-*.keystore
 *.jks
-
-# Build artifacts
-build/
-dist/
+*.ipa

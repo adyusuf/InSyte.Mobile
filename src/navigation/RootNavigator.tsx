@@ -36,6 +36,14 @@ function MainNavigator() {
         headerShown: true,
         tabBarActiveTintColor: '#2563eb',
         tabBarInactiveTintColor: '#9ca3af',
+        tabBarStyle: {
+          height: 60,
+          paddingBottom: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          marginTop: 0,
+        },
       }}
     >
       <Tab.Screen

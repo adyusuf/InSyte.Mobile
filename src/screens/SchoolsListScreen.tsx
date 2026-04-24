@@ -75,6 +75,7 @@ export default function SchoolsListScreen({ navigation }: any) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#2563eb" />
+        <Text style={{ marginTop: 12, color: '#666' }}>Okullar yükleniyor...</Text>
       </View>
     );
   }
@@ -83,6 +84,9 @@ export default function SchoolsListScreen({ navigation }: any) {
     return (
       <View style={styles.centerContainer}>
         <Text style={styles.errorText}>Hata: Okullar yüklenemedi</Text>
+        <Text style={{ marginTop: 8, color: '#666', fontSize: 12 }}>
+          {error instanceof Error ? error.message : 'Bilinmeyen hata'}
+        </Text>
       </View>
     );
   }

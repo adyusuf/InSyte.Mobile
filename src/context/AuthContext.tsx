@@ -34,11 +34,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const bootstrapAsync = async () => {
     try {
-      const tokens = await AsyncStorage.getItem('tokens');
+      let tokens = null;
+      try {
+        tokens = await AsyncStorage.getItem('tokens');
+      } catch (storageError) {
+        // AsyncStorage might fail on web, try localStorage
+        if (typeof localStorage !== 'undefined') {
+          tokens = localStorage.getItem('tokens');
+        }
+      }
+
       if (tokens) {
         const { access_token } = JSON.parse(tokens);
         api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-        
+
         const response = await api.get<any>('/auth/me');
         setUser(response.data.data);
         setIsSignedIn(true);
@@ -54,12 +63,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await api.post<any>('/auth/login', { email, password });
       const { access_token, refresh_token, user: userData } = response.data.data;
-      
-      await AsyncStorage.setItem('tokens', JSON.stringify({
-        access_token,
-        refresh_token,
-      }));
-      
+
+      const tokenData = JSON.stringify({ access_token, refresh_token });
+      try {
+        await AsyncStorage.setItem('tokens', tokenData);
+      } catch {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('tokens', tokenData);
+        }
+      }
+
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       setUser(userData);
       setIsSignedIn(true);
@@ -70,7 +83,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem('tokens');
+      try {
+        await AsyncStorage.removeItem('tokens');
+      } catch {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('tokens');
+        }
+      }
       api.defaults.headers.common['Authorization'] = '';
       setUser(null);
       setIsSignedIn(false);
@@ -81,17 +100,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshToken = async () => {
     try {
-      const tokens = await AsyncStorage.getItem('tokens');
+      let tokens = null;
+      try {
+        tokens = await AsyncStorage.getItem('tokens');
+      } catch {
+        if (typeof localStorage !== 'undefined') {
+          tokens = localStorage.getItem('tokens');
+        }
+      }
+
       if (tokens) {
         const { refresh_token } = JSON.parse(tokens);
         const response = await api.post<any>('/auth/refresh', { refreshToken: refresh_token });
         const { access_token, refresh_token: newRefreshToken } = response.data.data;
-        
-        await AsyncStorage.setItem('tokens', JSON.stringify({
+
+        const tokenData = JSON.stringify({
           access_token,
           refresh_token: newRefreshToken,
-        }));
-        
+        });
+
+        try {
+          await AsyncStorage.setItem('tokens', tokenData);
+        } catch {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('tokens', tokenData);
+          }
+        }
+
         api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       }
     } catch (error) {

@@ -8,10 +8,44 @@ const api = axios.create({
   timeout: 10000,
 });
 
+// Helper to get tokens from storage (AsyncStorage or localStorage)
+const getTokens = async () => {
+  try {
+    return await AsyncStorage.getItem('tokens');
+  } catch {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('tokens');
+    }
+    return null;
+  }
+};
+
+// Helper to set tokens in storage
+const setTokens = async (tokenData: string) => {
+  try {
+    await AsyncStorage.setItem('tokens', tokenData);
+  } catch {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('tokens', tokenData);
+    }
+  }
+};
+
+// Helper to remove tokens from storage
+const removeTokens = async () => {
+  try {
+    await AsyncStorage.removeItem('tokens');
+  } catch {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('tokens');
+    }
+  }
+};
+
 // Request interceptor to add auth token
 api.interceptors.request.use(async (config) => {
   try {
-    const tokens = await AsyncStorage.getItem('tokens');
+    const tokens = await getTokens();
     if (tokens) {
       const { access_token } = JSON.parse(tokens);
       config.headers.Authorization = `Bearer ${access_token}`;
@@ -35,7 +69,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const tokens = await AsyncStorage.getItem('tokens');
+        const tokens = await getTokens();
         if (tokens) {
           const { refresh_token } = JSON.parse(tokens);
           const response = await axios.post(`${API_URL}/auth/refresh`, {
@@ -44,7 +78,7 @@ api.interceptors.response.use(
 
           const { access_token, refresh_token: newRefreshToken } = response.data.data;
 
-          await AsyncStorage.setItem('tokens', JSON.stringify({
+          await setTokens(JSON.stringify({
             access_token,
             refresh_token: newRefreshToken,
           }));
@@ -56,7 +90,7 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         // If refresh fails, clear tokens and return error
-        await AsyncStorage.removeItem('tokens');
+        await removeTokens();
         return Promise.reject(refreshError);
       }
     }
