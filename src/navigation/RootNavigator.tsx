@@ -12,6 +12,8 @@ import TeachersListScreen from '../screens/TeachersListScreen';
 import TeacherDetailScreen from '../screens/TeacherDetailScreen';
 import VideosListScreen from '../screens/VideosListScreen';
 import ReportsListScreen from '../screens/ReportsListScreen';
+import WorkingGroupsListScreen from '../screens/WorkingGroupsListScreen';
+import CouncilsListScreen from '../screens/CouncilsListScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
@@ -68,6 +70,22 @@ function MainNavigator() {
         options={{
           title: 'Raporlar',
           tabBarLabel: 'Raporlar',
+        }}
+      />
+      <Tab.Screen
+        name="WorkingGroups"
+        component={WorkingGroupsListScreen}
+        options={{
+          title: 'Çalışma Grupları',
+          tabBarLabel: 'Gruplar',
+        }}
+      />
+      <Tab.Screen
+        name="Councils"
+        component={CouncilsListScreen}
+        options={{
+          title: 'Kurullar',
+          tabBarLabel: 'Kurullar',
         }}
       />
       <Tab.Screen
