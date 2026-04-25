@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../lib/api';
+import { apiEndpoints } from '../lib/endpoints';
 
 interface User {
   id: string;
@@ -22,113 +23,89 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Token depolama yardımcısı — AsyncStorage öncelikli, web'de fallback
+const tokenStore = {
+  get: async (): Promise<string | null> => {
+    try {
+      return await AsyncStorage.getItem('tokens');
+    } catch {
+      return typeof localStorage !== 'undefined' ? localStorage.getItem('tokens') : null;
+    }
+  },
+  set: async (value: string): Promise<void> => {
+    try {
+      await AsyncStorage.setItem('tokens', value);
+    } catch {
+      if (typeof localStorage !== 'undefined') localStorage.setItem('tokens', value);
+    }
+  },
+  remove: async (): Promise<void> => {
+    try {
+      await AsyncStorage.removeItem('tokens');
+    } catch {
+      if (typeof localStorage !== 'undefined') localStorage.removeItem('tokens');
+    }
+  },
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
-  // Check if user is already logged in on app start
   useEffect(() => {
     bootstrapAsync();
   }, []);
 
   const bootstrapAsync = async () => {
     try {
-      let tokens = null;
-      try {
-        tokens = await AsyncStorage.getItem('tokens');
-      } catch (storageError) {
-        // AsyncStorage might fail on web, try localStorage
-        if (typeof localStorage !== 'undefined') {
-          tokens = localStorage.getItem('tokens');
-        }
-      }
-
+      const tokens = await tokenStore.get();
       if (tokens) {
         const { access_token } = JSON.parse(tokens);
         api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-
-        const response = await api.get<any>('/auth/me');
+        const response = await api.get<any>(apiEndpoints.auth.me);
         setUser(response.data.data);
         setIsSignedIn(true);
       }
     } catch (error) {
-      console.error('Failed to restore token:', error);
+      console.error('Token geri yükleme başarısız:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await api.post<any>('/auth/login', { email, password });
-      const { access_token, refresh_token, user: userData } = response.data.data;
+    const response = await api.post<any>(apiEndpoints.auth.login, { email, password });
+    const { access_token, refresh_token, user: userData } = response.data.data;
 
-      const tokenData = JSON.stringify({ access_token, refresh_token });
-      try {
-        await AsyncStorage.setItem('tokens', tokenData);
-      } catch {
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('tokens', tokenData);
-        }
-      }
-
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      setUser(userData);
-      setIsSignedIn(true);
-    } catch (error) {
-      throw error;
-    }
+    await tokenStore.set(JSON.stringify({ access_token, refresh_token }));
+    api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+    setUser(userData);
+    setIsSignedIn(true);
   };
 
   const logout = async () => {
     try {
-      try {
-        await AsyncStorage.removeItem('tokens');
-      } catch {
-        if (typeof localStorage !== 'undefined') {
-          localStorage.removeItem('tokens');
-        }
-      }
+      await tokenStore.remove();
       api.defaults.headers.common['Authorization'] = '';
       setUser(null);
       setIsSignedIn(false);
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Çıkış hatası:', error);
     }
   };
 
   const refreshToken = async () => {
     try {
-      let tokens = null;
-      try {
-        tokens = await AsyncStorage.getItem('tokens');
-      } catch {
-        if (typeof localStorage !== 'undefined') {
-          tokens = localStorage.getItem('tokens');
-        }
-      }
+      const tokens = await tokenStore.get();
+      if (!tokens) throw new Error('Token bulunamadı');
 
-      if (tokens) {
-        const { refresh_token } = JSON.parse(tokens);
-        const response = await api.post<any>('/auth/refresh', { refreshToken: refresh_token });
-        const { access_token, refresh_token: newRefreshToken } = response.data.data;
+      const { refresh_token } = JSON.parse(tokens);
+      const response = await api.post<any>(apiEndpoints.auth.refresh, { refreshToken: refresh_token });
+      const { access_token, refresh_token: newRefresh } = response.data.data;
 
-        const tokenData = JSON.stringify({
-          access_token,
-          refresh_token: newRefreshToken,
-        });
-
-        try {
-          await AsyncStorage.setItem('tokens', tokenData);
-        } catch {
-          if (typeof localStorage !== 'undefined') {
-            localStorage.setItem('tokens', tokenData);
-          }
-        }
-
-        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      }
+      await tokenStore.set(JSON.stringify({ access_token, refresh_token: newRefresh }));
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
     } catch (error) {
       await logout();
       throw error;
