@@ -10,6 +10,12 @@ interface ButtonProps {
   style?: ViewStyle;
 }
 
+const variantStyles = {
+  primary: { backgroundColor: '#2563eb' },
+  secondary: { backgroundColor: '#e5e7eb' },
+  danger: { backgroundColor: '#dc2626' },
+} as const;
+
 export const Button: React.FC<ButtonProps> = ({
   title,
   onPress,
@@ -22,7 +28,7 @@ export const Button: React.FC<ButtonProps> = ({
     <TouchableOpacity
       style={[
         styles.button,
-        styles[`button${variant.charAt(0).toUpperCase() + variant.slice(1)}`],
+        variantStyles[variant],
         (loading || disabled) && styles.buttonDisabled,
         style,
       ]}
@@ -45,15 +51,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonPrimary: {
-    backgroundColor: '#2563eb',
-  },
-  buttonSecondary: {
-    backgroundColor: '#e5e7eb',
-  },
-  buttonDanger: {
-    backgroundColor: '#dc2626',
   },
   buttonDisabled: {
     opacity: 0.6,

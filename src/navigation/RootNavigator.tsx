@@ -107,7 +107,7 @@ function RootStackNavigator() {
         headerShown: false,
       }}
     >
-      <Stack.Group screenOptions={{ animationEnabled: true }}>
+      <Stack.Group screenOptions={{ animation: 'default' }}>
         <Stack.Screen name="Main" component={MainNavigator} />
         <Stack.Screen
           name="SchoolDetail"
