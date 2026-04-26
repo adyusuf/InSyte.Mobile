@@ -29,18 +29,4 @@ export const apiEndpoints = {
     list: '/evaluations',
     detail: (id: string) => `/evaluations/${id}`,
   },
-  workingGroups: {
-    list: '/v1/working-groups',
-    detail: (id: string) => `/v1/working-groups/${id}`,
-    members: (id: string) => `/v1/working-groups/${id}/members`,
-    addMember: (id: string) => `/v1/working-groups/${id}/members`,
-    removeMember: (groupId: string, memberId: string) => `/v1/working-groups/${groupId}/members/${memberId}`,
-  },
-  councils: {
-    list: '/v1/councils',
-    detail: (id: string) => `/v1/councils/${id}`,
-    members: (id: string) => `/v1/councils/${id}/members`,
-    addMember: (id: string) => `/v1/councils/${id}/members`,
-    removeMember: (councilId: string, memberId: string) => `/v1/councils/${councilId}/members/${memberId}`,
-  },
 } as const;
