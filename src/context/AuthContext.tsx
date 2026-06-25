@@ -2,15 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../lib/api';
 import { apiEndpoints } from '../lib/endpoints';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'Admin' | 'Advisor' | 'SchoolAdmin' | 'Teacher';
-  isActive: boolean;
-  createdAt: string;
-}
+import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -61,8 +53,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const tokens = await tokenStore.get();
       if (tokens) {
-        const { access_token } = JSON.parse(tokens);
-        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+        const { accessToken } = JSON.parse(tokens);
+        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         const response = await api.get<any>(apiEndpoints.auth.me);
         setUser(response.data.data);
         setIsSignedIn(true);
@@ -76,10 +68,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     const response = await api.post<any>(apiEndpoints.auth.login, { email, password });
-    const { access_token, refresh_token, user: userData } = response.data.data;
+    const { accessToken, refreshToken, user: userData } = response.data.data;
 
-    await tokenStore.set(JSON.stringify({ access_token, refresh_token }));
-    api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+    await tokenStore.set(JSON.stringify({ accessToken, refreshToken }));
+    api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     setUser(userData);
     setIsSignedIn(true);
   };
@@ -100,12 +92,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const tokens = await tokenStore.get();
       if (!tokens) throw new Error('Token bulunamadı');
 
-      const { refresh_token } = JSON.parse(tokens);
-      const response = await api.post<any>(apiEndpoints.auth.refresh, { refreshToken: refresh_token });
-      const { access_token, refresh_token: newRefresh } = response.data.data;
+      const { refreshToken } = JSON.parse(tokens);
+      const response = await api.post<any>(apiEndpoints.auth.refresh, { refreshToken });
+      const { accessToken, refreshToken: newRefresh } = response.data.data;
 
-      await tokenStore.set(JSON.stringify({ access_token, refresh_token: newRefresh }));
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      await tokenStore.set(JSON.stringify({ accessToken, refreshToken: newRefresh }));
+      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     } catch (error) {
       await logout();
       throw error;

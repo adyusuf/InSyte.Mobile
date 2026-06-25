@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { fullName } from '../types';
 
 export default function TeacherDetailScreen({ route }: any) {
   const { teacher } = route.params;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{teacher.name}</Text>
+      <Text style={styles.title}>{fullName(teacher)}</Text>
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Email:</Text>
         <Text style={styles.value}>{teacher.email}</Text>

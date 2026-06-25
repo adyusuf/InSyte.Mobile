@@ -1,7 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://localhost:5090/api';
+// Web ile aynı desen: taban URL + `/api/v1`. Env yoksa yerel API.
+const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5090') + '/api/v1';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -47,8 +48,8 @@ api.interceptors.request.use(async (config) => {
   try {
     const tokens = await getTokens();
     if (tokens) {
-      const { access_token } = JSON.parse(tokens);
-      config.headers.Authorization = `Bearer ${access_token}`;
+      const { accessToken } = JSON.parse(tokens);
+      if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
     }
   } catch (error) {
     console.error('Error getting auth token:', error);
@@ -71,20 +72,19 @@ api.interceptors.response.use(
       try {
         const tokens = await getTokens();
         if (tokens) {
-          const { refresh_token } = JSON.parse(tokens);
-          const response = await axios.post(`${API_URL}/auth/refresh`, {
-            refreshToken: refresh_token,
-          });
+          const { refreshToken } = JSON.parse(tokens);
+          const response = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
 
-          const { access_token, refresh_token: newRefreshToken } = response.data.data;
+          // Rotasyon: API yeni access + yeni refresh döndürür, eskisi iptal olur.
+          const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
           await setTokens(JSON.stringify({
-            access_token,
-            refresh_token: newRefreshToken,
+            accessToken,
+            refreshToken: newRefreshToken,
           }));
 
-          api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-          originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
+          api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
 
           return api(originalRequest);
         }

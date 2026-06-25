@@ -1,9 +1,9 @@
 export const apiEndpoints = {
   auth: {
-    login: '/v1/auth/login',
-    logout: '/v1/auth/logout',
-    refresh: '/v1/auth/refresh',
-    me: '/v1/auth/me',
+    login: '/auth/login',
+    logout: '/auth/logout',
+    refresh: '/auth/refresh',
+    me: '/auth/me',
   },
   schools: {
     list: '/schools',

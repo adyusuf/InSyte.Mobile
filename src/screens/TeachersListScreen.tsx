@@ -10,14 +10,7 @@ import {
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
-
-interface Teacher {
-  id: string;
-  name: string;
-  email: string;
-  schoolId: string;
-  isActive: boolean;
-}
+import { Teacher, fullName } from '../types';
 
 export default function TeachersListScreen({ navigation }: any) {
   const [search, setSearch] = useState('');
@@ -37,7 +30,7 @@ export default function TeachersListScreen({ navigation }: any) {
       style={styles.card}
       onPress={() => navigation.navigate('TeacherDetail', { teacher: item })}
     >
-      <Text style={styles.name}>{item.name}</Text>
+      <Text style={styles.name}>{fullName(item)}</Text>
       <Text style={styles.email}>{item.email}</Text>
     </TouchableOpacity>
   );

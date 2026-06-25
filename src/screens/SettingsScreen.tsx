@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { fullName } from '../types';
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
@@ -11,7 +12,7 @@ export default function SettingsScreen() {
         <Text style={styles.title}>Profil</Text>
         <View style={styles.infoBox}>
           <Text style={styles.label}>Ad:</Text>
-          <Text style={styles.value}>{user?.name}</Text>
+          <Text style={styles.value}>{user ? fullName(user) : ''}</Text>
           
           <Text style={[styles.label, { marginTop: 12 }]}>Email:</Text>
           <Text style={styles.value}>{user?.email}</Text>
