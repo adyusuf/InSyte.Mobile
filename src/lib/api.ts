@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Web ile aynı desen: taban URL + `/api/v1`. Env yoksa yerel API.
-const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5090') + '/api/v1';
+const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8092') + '/api/v1';
 
 const api = axios.create({
   baseURL: API_URL,

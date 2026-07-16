@@ -1,6 +1,6 @@
-# InSyte Mobile
+# MirrorEdu Mobile
 
-React Native mobile application for the InSyte education evaluation system.
+React Native mobile application for the MirrorEdu education evaluation system.
 
 ## Features
 

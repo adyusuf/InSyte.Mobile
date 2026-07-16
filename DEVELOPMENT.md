@@ -1,4 +1,4 @@
-# InSyte Mobile Development Guide
+# MirrorEdu Mobile Development Guide
 
 ## Getting Started
 
@@ -12,8 +12,8 @@
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/adyusuf/InSyte.Mobile.git
-cd InSyte.Mobile
+git clone https://github.com/adyusuf/MirrorEdu.Mobile.git
+cd MirrorEdu.Mobile
 ```
 
 2. Install dependencies:

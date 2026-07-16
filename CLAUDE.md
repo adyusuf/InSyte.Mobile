@@ -14,7 +14,7 @@
 - ✅ Bildirimler (push) — yeni rapor, AI tamamlandı, onay isteği
 - ✅ Video listesi görüntüleme + oynatma
 - ✅ Rapor listesi + detay (PDF görüntüleme)
-- ✅ Okul / öğretmen / ders programı görüntüleme
+- ✅ Okul / öğretmen görüntüleme
 
 İlk mobil sürümde **olmayacaklar**:
 
@@ -57,7 +57,6 @@ mobile/
 │   │   ├── raporlar/
 │   │   ├── okullar/
 │   │   ├── ogretmenler/
-│   │   ├── ders-programi/
 │   │   └── bildirimler/
 │   ├── features/           ← Web ile paralel
 │   ├── components/
@@ -142,7 +141,7 @@ npm run typecheck
 
 `.env`:
 ```
-EXPO_PUBLIC_API_URL=http://localhost:5000
+EXPO_PUBLIC_API_URL=http://localhost:8092
 ```
 
 ## Yapma

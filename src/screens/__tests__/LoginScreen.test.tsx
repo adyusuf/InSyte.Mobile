@@ -17,7 +17,7 @@ beforeEach(() => {
 describe('LoginScreen', () => {
   it('başlık ve form alanlarını render eder', () => {
     const { getByText, getByPlaceholderText } = render(<LoginScreen />);
-    expect(getByText('InSyte')).toBeTruthy();
+    expect(getByText('MirrorEdu')).toBeTruthy();
     expect(getByText('Eğitim Değerlendirme Sistemi')).toBeTruthy();
     expect(getByPlaceholderText('example@example.com')).toBeTruthy();
     expect(getByPlaceholderText('Şifreniz')).toBeTruthy();
@@ -36,12 +36,12 @@ describe('LoginScreen', () => {
   it('email + şifre girilip butona basıldığında login fonksiyonu çağrılır', async () => {
     mockLogin.mockResolvedValueOnce(undefined);
     const { getByText, getByPlaceholderText } = render(<LoginScreen />);
-    fireEvent.changeText(getByPlaceholderText('example@example.com'), 'admin@insyte.com');
+    fireEvent.changeText(getByPlaceholderText('example@example.com'), 'admin@mirroredu.com');
     fireEvent.changeText(getByPlaceholderText('Şifreniz'), 'Admin@123');
     fireEvent.press(getByText('Giriş Yap'));
 
     await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalledWith('admin@insyte.com', 'Admin@123');
+      expect(mockLogin).toHaveBeenCalledWith('admin@mirroredu.com', 'Admin@123');
     });
   });
 });

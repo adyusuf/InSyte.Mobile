@@ -1,4 +1,4 @@
-# InSyte Mobile API Documentation
+# MirrorEdu Mobile API Documentation
 
 ## Authentication Endpoints
 

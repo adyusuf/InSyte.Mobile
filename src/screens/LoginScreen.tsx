@@ -45,7 +45,7 @@ export default function LoginScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.logoContainer}>
-          <Text style={styles.title}>InSyte</Text>
+          <Text style={styles.title}>MirrorEdu</Text>
           <Text style={styles.subtitle}>Eğitim Değerlendirme Sistemi</Text>
         </View>
 
